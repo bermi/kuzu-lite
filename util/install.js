@@ -9,6 +9,11 @@ const platform = process.platform;
 const arch = process.arch;
 const rootDir = path.join(__dirname, "..");
 
+const isAlpine = fs.readFileSync('/etc/os-release', 'utf8').includes('Alpine Linux');
+if (isAlpine) {
+  platform = "alpine"
+}
+
 const prebuiltPath = path.join(
   rootDir,
   "prebuilt",
