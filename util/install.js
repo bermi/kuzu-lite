@@ -4,10 +4,10 @@ const fs = require("fs");
 const https = require("https");
 const { HttpsProxyAgent } = require('https-proxy-agent');
 
-const platform = process.platform;
 const arch = process.arch;
 const rootDir = path.join(__dirname, "..");
 
+let platform = process.platform;
 const isAlpine = platform == "linux" && fs.readFileSync('/etc/os-release', 'utf8').includes('Alpine Linux');
 if (isAlpine) {
   platform = "alpine";
