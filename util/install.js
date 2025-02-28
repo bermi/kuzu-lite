@@ -23,7 +23,7 @@ const targetPath = path.join(rootDir, "kuzujs.node");
 const download = (url, dest) => {
   return new Promise((resolve, reject) => {
     const file = fs.createWriteStream(dest);
-    const proxy = process.env.HTTP_PROXY;
+    const proxy = process.env.HTTP_PROXY || process.env.HTTPS_PROXY || process.env.PROXY || process.env.http_proxy || process.env.https_proxy || process.env.proxy;
     const agent = proxy ? new HttpsProxyAgent(proxy) : undefined;
 
     const reqOptions = { agent };
@@ -46,6 +46,22 @@ const download = (url, dest) => {
   });
 };
 
+
+const downloadWithCDN = (error) =>{  
+  const CDNBaseURL="https://graphxr.oss-cn-shanghai.aliyuncs.com/kuzu"
+  prebuiltURL = prebuiltURL.replace(baseURL,CDNBaseURL);
+  download(prebuiltURL, targetPath)
+  .then(() => {
+    console.log(`Successfully downloaded to ${targetPath}`);
+    console.log("Done!");
+    process.exit(0);
+  })
+  .catch(() => {
+    console.error(`Error downloading prebuilt binary: ${error.message}`);
+    console.log("Prebuilt binary download failed. Please contact sean@kineviz.com .");
+  });
+}
+
 download(prebuiltURL, targetPath)
   .then(() => {
     console.log(`Successfully downloaded to ${targetPath}`);
@@ -53,6 +69,6 @@ download(prebuiltURL, targetPath)
     process.exit(0);
   })
   .catch((err) => {
-    console.error(`Error downloading prebuilt binary: ${err.message}`);
-    console.log("Prebuilt binary download failed, building from source...");
+    console.log("Try download with CND");
+    downloadWithCDN(err)
   });
