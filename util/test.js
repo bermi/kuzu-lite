@@ -6,32 +6,22 @@ const kuzu = require("./../");
   const db = new kuzu.Database(path.join(__dirname, "./demo_db"));
   const conn = new kuzu.Connection(db);
   try {
-    await conn.query(
-      "CREATE NODE TABLE Movie (name STRING, PRIMARY KEY(name))"
-    );
-    await conn.query(
-      "CREATE NODE TABLE Person (name STRING, birthDate STRING, PRIMARY KEY(name))"
-    );
-    await conn.query("CREATE REL TABLE ActedIn (FROM Person TO Movie)");
-
-    await conn.query(
-      "CREATE (:Person {name: 'Al Pacino', birthDate: '1940-04-25'})"
-    );
-    await conn.query(
-      "CREATE (:Person {name: 'Robert De Nero', birthDate: '1943-08-17'})"
-    );
-    await conn.query("CREATE (:Movie {name: 'The Godfather: Part II'})");
-    await conn.query(
-      "MATCH (p:Person), (m:Movie) WHERE p.name = 'Al Pacino' AND m.name = 'The Godfather: Part II' CREATE (p)-[:ActedIn]->(m)"
-    );
-    await conn.query(
-      "MATCH (p:Person), (m:Movie) WHERE p.name = 'Robert De Nero' AND m.name = 'The Godfather: Part II' CREATE (p)-[:ActedIn]->(m)"
-    );
+    await conn.query(`
+      CREATE NODE TABLE Movie (name STRING, PRIMARY KEY(name));
+      CREATE NODE TABLE Person (name STRING, birthDate STRING, PRIMARY KEY(name));
+      CREATE REL TABLE ActedIn (FROM Person TO Movie);
+      CREATE (:Person {name: 'Al Pacino', birthDate: '1940-04-25'});
+      CREATE (:Person {name: 'Robert De Nero', birthDate: '1943-08-17'});
+      CREATE (:Movie {name: 'The Godfather: Part II'});
+      MATCH (p:Person), (m:Movie) WHERE p.name = 'Al Pacino' AND m.name = 'The Godfather: Part II' CREATE (p)-[:ActedIn]->(m);
+      MATCH (p:Person), (m:Movie) WHERE p.name = 'Robert De Nero' AND m.name = 'The Godfather: Part II' CREATE (p)-[:ActedIn]->(m);
+      `);
   } catch (e) {
     console.error("Create DB failed:",e.message);
   }
 
   const queryResult = await conn.query("MATCH (p)-[:ActedIn]->(m) RETURN *");
+
 
   // Get all rows from the query result
   const rows = await queryResult.getAll();
@@ -40,6 +30,7 @@ const kuzu = require("./../");
   for (const row of rows) {
     console.log(row);
   }
+  conn.close();
+  db.close();
 
-  //删除demo_db
 })();

@@ -48,11 +48,11 @@ jobs:
           
     - name: Copy compiled file to repo directory
       run: |
-      mkdir -p prebuilt \
-      && cp -f node_modules/kuzu/prebuilt/*.node prebuilt/
+        mkdir -p prebuilt \
+        && cp -f node_modules/kuzu/prebuilt/*.node prebuilt/
       
     - name: Commit and push changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-      commit_message: "Add compiled kuzujs-alpine-${{ matrix.arch }}.node [skip ci]"
-      file_pattern: 'prebuilt/*.node'
+        commit_message: "Add compiled kuzujs-alpine-${{ matrix.arch }}.node [skip ci]"
+        file_pattern: 'prebuilt/*.node'
