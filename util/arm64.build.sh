@@ -1,54 +1,58 @@
-# 在宿主机（非容器内）安装 QEMU
-sudo apt-get install qemu-user-static  # Debian/Ubuntu
+# 1. 在宿主机（非容器内）安装 QEMU
+# sudo apt-get install qemu-user-static  # Debian/Ubuntu
 
-# 复制 QEMU 模拟器到容器
-docker rm -f qemu-aarch64-alpine \
-&& \
-docker run -it \
---name qemu-aarch64-alpine \
---platform linux/arm64 \
-  -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-static \
+# re-install kuzu for clean all build info
+yarn remove kuzu
+yarn add kuzu
+
+
+# 2. 复制 QEMU 模拟器到容器
+docker rm -f qemu-aarch64-alpine `
+&& `
+docker run -it `
+--name qemu-aarch64-alpine `
+-v .\node_modules\kuzu:/kuzu `
+--platform linux/arm64 `
+  -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-static `
 node:18-alpine
 
  
-# docker rm -f qemu-amd64-alpine \
-# && \
-# docker run -it \
-# --platform linux/amd64 \
-# --name qemu-amd64-alpine \
-# node:18-alpine
+docker rm -f qemu-amd64-alpine `
+&& `
+docker run -it `
+--platform linux/amd64 `
+-v .\node_modules\kuzu:/kuzu `
+--name qemu-amd64-alpine `
+node:18-alpine
 
 
-1. vscode attach to running container
-2. install the kuzu
-```
-yarn add kuzu
-```
 
-3. go to kuzu source
+# 3. go to kuzu source
 
-cd ./node_modules/kuzu
-then goto kuzu-source/tools/nodejs_api
+cd /kuzu/kuzu-source/tools/nodejs_api
 
-4. modify the build.js  THREADS=2
 
-5. run ***yarn***
+# 4. run ***yarn***
 
-6.
-apk add --no-cache \
+yarn install
+ 
+
+# 5. install  dependencies  
+apk add --no-cache -X https://mirrors.aliyun.com/alpine/v3.21/main  \
     g++ \
     gcompat \
     libc6-compat \
     build-base \
     python3 \
-    nodejs-npm \
     libressl-dev \
-    musl-libresolv \
     make \
     cmake \
     zlib-dev \
-    musl-dev
+    musl-dev 
+    
 
-7.  yarn build
+# 6.  yarn build
+yarn build
 
-8.  copy the kuzujs.node to kuzujs-alpine-arm64.node
+# 7.  copy the kuzujs.node to kuzujs-alpine-arm64.node
+cp -f ./build/kuzujs.node ./../../../prebuilt/kuzujs-alpine-arm64.node

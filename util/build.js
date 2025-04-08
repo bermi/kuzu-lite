@@ -137,10 +137,13 @@ deleteFiles(rootDir, [
   "package.json",
   "util",
   "node_modules",
+  "README.md",
   ".git",
   ".vscode",
   ".gitignore",
   ".github",
+  ".dockerignore",
+  ".npmignore"
 ]);
 
 const srcDir = path.join(rootDir, "node_modules", "kuzu");
@@ -153,8 +156,11 @@ if (fs.existsSync(srcDir)) {
     "kuzujs.node",
     "package.json",
     "install.js",
+    "README.md",
     ".gitignore",
     ".github",
+    ".dockerignore",
+    ".npmignore"
   ]);
   console.log("Copying completed!");
 } else {

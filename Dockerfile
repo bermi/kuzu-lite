@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-alpine as base
 
 USER root
 
@@ -14,6 +14,11 @@ apk add --no-cache \
     zlib-dev \
     musl-dev
 
+WORKDIR /app
 
-## for run the kuzu
-apk add --no-cache   gcompat libc6-compat
+RUN yarn add kuzu
+
+RUN cd /app/node_modules/kuzu/kuzu-source/tools/nodejs_api && \
+    yarn install && \
+    yarn build 
+ 
