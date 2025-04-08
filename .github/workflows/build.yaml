@@ -50,6 +50,19 @@ jobs:
       run: |
         mkdir -p prebuilt \
         && cp -f node_modules/kuzu/prebuilt/*.node prebuilt/
+
+    - name: Test in Docker for alpine (${{ matrix.arch }})
+      id: docker_test
+      run: |
+        docker run --rm \
+          --platform linux/${{ matrix.arch }} \
+          -v ${{ github.workspace }}:/kuzu-lite \
+          node:18-alpine /bin/sh -c "
+            cd /kuzu-lite && \
+            cp -f /kuzu-lite/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node /kuzu-lite/kuzujs.node && \
+            cd /kuzu-lite/util && \
+            node ./test.js 
+          " || echo "::set-output name=test_failed::true"
       
     - name: Commit and push changes
       uses: stefanzweifel/git-auto-commit-action@v4
