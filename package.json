@@ -1,5 +1,5 @@
 {
-  "name": "@kineviz/kuzu",
+  "name": "@kineviz/kuzu-lite",
   "version": "0.9.0",
   "description": "An in-process property graph database management system built for query speed and scalability.",
   "main": "index.js",
