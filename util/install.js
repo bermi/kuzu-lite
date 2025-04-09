@@ -14,7 +14,9 @@ if (isAlpine) {
   platform = "alpine";
 }
 
-const baseURL = `https://raw.githubusercontent.com/Kineviz/kuzu-lite/refs/tags/${packageJson.version}/prebuilt`;
+const packageVersion =  String(packageJson.version).split("-")[0];
+
+const baseURL = `https://raw.githubusercontent.com/Kineviz/kuzu-lite/refs/tags/${packageVersion}/prebuilt`;
 const prebuiltURL = `${baseURL}/kuzujs-${platform}-${arch}.node`;
 
 console.log(`Downloading prebuilt binary from ${prebuiltURL}...`);
@@ -49,7 +51,7 @@ const download = (url, dest) => {
 
 
 const downloadWithCDN = (error) =>{  
-  const CDNBaseURL=`https://graphxr.oss-cn-shanghai.aliyuncs.com/kuzu@${packageJson.version}`
+  const CDNBaseURL=`https://graphxr.oss-cn-shanghai.aliyuncs.com/kuzu@${packageVersion}`
   const newPrebuiltURL = prebuiltURL.replace(baseURL,CDNBaseURL);
   download(newPrebuiltURL, targetPath)
   .then(() => {
