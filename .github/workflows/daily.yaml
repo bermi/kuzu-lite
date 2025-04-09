@@ -1,0 +1,42 @@
+name: Daily Version Check
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天 UTC 时间 0:00 运行
+
+jobs:
+  check-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check versions
+        id: check_versions
+        run: |
+          KUZU_VERSION=$(npm view kuzu version)
+          KUZU_LITE_VERSION=$(npm view kuzu-lite version || echo "0.0.0")
+          echo "kuzu_version=$KUZU_VERSION" >> $GITHUB_OUTPUT
+          echo "kuzu_lite_version=$KUZU_LITE_VERSION" >> $GITHUB_OUTPUT
+          
+          if [ "$(printf '%s\n' "$KUZU_VERSION" "$KUZU_LITE_VERSION" | sort -V | head -n1)" != "$KUZU_VERSION" ]; then
+            echo "kuzu_newer=true" >> $GITHUB_OUTPUT
+            echo "Kuzu version ($KUZU_VERSION) is newer than kuzu-lite ($KUZU_LITE_VERSION)"
+          else
+            echo "kuzu_newer=false" >> $GITHUB_OUTPUT
+            echo "Kuzu version ($KUZU_VERSION) is not newer than kuzu-lite ($KUZU_LITE_VERSION)"
+          fi
+
+      - name: Send notification
+        if: steps.check_versions.outputs.kuzu_newer == 'true'
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const kuzu_version = '${{ steps.check_versions.outputs.kuzu_version }}';
+            const kuzu_lite_version = '${{ steps.check_versions.outputs.kuzu_lite_version }}';
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `kuzu 更新通知: 新版本 ${kuzu_version} 可用`,
+              body: `检测到 kuzu (${kuzu_version}) 比当前的 kuzu-lite (${kuzu_lite_version}) 版本更新。\n\n请考虑更新 kuzu-lite。`,
+              labels: ['version-update']
+            });

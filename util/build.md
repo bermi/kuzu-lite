@@ -6,14 +6,14 @@ yarn remove kuzu
 yarn add kuzu
 
 
-# 2. 复制 QEMU 模拟器到容器
+# 2. run qemu-aarch64-alpine and qemu-amd64-alpine
+
 docker rm -f qemu-aarch64-alpine `
 && `
 docker run -it `
 --name qemu-aarch64-alpine `
 -v .\node_modules\kuzu:/kuzu `
 --platform linux/arm64 `
-  -v /usr/bin/qemu-aarch64-static:/usr/bin/qemu-aarch64-static `
 node:18-alpine
 
  
@@ -37,7 +37,7 @@ cd /kuzu/kuzu-source/tools/nodejs_api
 yarn install
  
 
-# 5. install  dependencies  
+# 5. install  dependencies  (alpine)
 apk add --no-cache -X https://mirrors.aliyun.com/alpine/v3.21/main  \
     g++ \
     gcompat \
@@ -49,7 +49,26 @@ apk add --no-cache -X https://mirrors.aliyun.com/alpine/v3.21/main  \
     cmake \
     zlib-dev \
     musl-dev 
-    
+
+# 5.1 install  dependencies  (ubuntu)
+
+sudo apt update
+sudo apt install -y \
+    g++ \
+    make \
+    cmake \
+    python3 \
+    libssl-dev \
+    zlib1g-dev \
+    musl-tools \
+    musl-dev \
+    gcc-aarch64-linux-gnu \
+    g++-aarch64-linux-gnu \
+    build-essential \
+    pkg-config \
+    wget \
+    curl
+
 
 # 6.  yarn build
 yarn build

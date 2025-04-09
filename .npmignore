@@ -1,10 +1,8 @@
 .*
-.github
-.vscode
 Dockerfile
 prebuilt
 util/demo_db
-util/demo_db2
+util/demo_*
 kuzujs.node
 node_modules
-
+test

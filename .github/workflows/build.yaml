@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
+  
   build:
     name: Build on ${{ matrix.arch }}
     runs-on: ubuntu-latest
@@ -49,7 +50,8 @@ jobs:
     - name: Copy compiled file to repo directory
       run: |
         mkdir -p prebuilt \
-        && cp -f node_modules/kuzu/prebuilt/*.node prebuilt/
+        && cp -f node_modules/kuzu/prebuilt/*.node prebuilt/ \
+        && yarn build 
 
     - name: Test in Docker for alpine (${{ matrix.arch }})
       id: docker_test
@@ -62,10 +64,10 @@ jobs:
             cp -f /kuzu-lite/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node /kuzu-lite/kuzujs.node && \
             cd /kuzu-lite/util && \
             node ./test.js 
-          " || echo "::set-output name=test_failed::true"
+          " || echo "test_failed=true" >> $GITHUB_OUTPUT
       
     - name: Commit and push changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: "Add compiled kuzujs-alpine-${{ matrix.arch }}.node [skip ci]"
-        file_pattern: 'prebuilt/*.node'
+        commit_message: "Add compiled kuzujs-alpine-${{ matrix.arch }}.node for kuzu v${{ needs.check-versions.outputs.kuzu_version }} [skip ci]"
+        file_pattern: 'prebuilt/*.node, *.js'

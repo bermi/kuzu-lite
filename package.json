@@ -9,6 +9,7 @@
     "url": "https://github.com/Kineviz/kuzu-lite.git"
   },
   "scripts": {
+    "build:kuzu": "bash ./util/buildKuzuWithDocker.sh",
     "build": "node util/build.js",
     "install": "node util/install.js",
     "release": "npm publish --access=public --registry https://registry.npmjs.org/"
