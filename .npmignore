@@ -4,5 +4,6 @@
 Dockerfile
 prebuilt
 util/demo_db
+util/demo_*
 kuzujs.node
-
+test

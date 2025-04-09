@@ -3,6 +3,7 @@ const process = require("process");
 const fs = require("fs");
 const https = require("https");
 const { HttpsProxyAgent } = require('https-proxy-agent');
+const packageJson = require("./../package.json");
 
 const arch = process.arch;
 const rootDir = path.join(__dirname, "..");
@@ -13,7 +14,9 @@ if (isAlpine) {
   platform = "alpine";
 }
 
-const baseURL = "https://raw.githubusercontent.com/Kineviz/kuzu-lite/refs/heads/master/prebuilt";
+const packageVersion =  String(packageJson.version).split("-")[0];
+
+const baseURL = `https://raw.githubusercontent.com/Kineviz/kuzu-lite/refs/tags/${packageVersion}/prebuilt`;
 const prebuiltURL = `${baseURL}/kuzujs-${platform}-${arch}.node`;
 
 console.log(`Downloading prebuilt binary from ${prebuiltURL}...`);
@@ -48,9 +51,9 @@ const download = (url, dest) => {
 
 
 const downloadWithCDN = (error) =>{  
-  const CDNBaseURL="https://graphxr.oss-cn-shanghai.aliyuncs.com/kuzu"
-  prebuiltURL = prebuiltURL.replace(baseURL,CDNBaseURL);
-  download(prebuiltURL, targetPath)
+  const CDNBaseURL=`https://graphxr.oss-cn-shanghai.aliyuncs.com/kuzu@${packageVersion}`
+  const newPrebuiltURL = prebuiltURL.replace(baseURL,CDNBaseURL);
+  download(newPrebuiltURL, targetPath)
   .then(() => {
     console.log(`Successfully downloaded to ${targetPath}`);
     console.log("Done!");
