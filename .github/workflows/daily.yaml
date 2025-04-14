@@ -12,7 +12,7 @@ jobs:
         id: check_versions
         run: |
           KUZU_VERSION=$(npm view kuzu version)
-          KUZU_LITE_VERSION=$(npm view kuzu-lite version || echo "0.0.0")
+          KUZU_LITE_VERSION=$(npm view @kineviz/kuzu-lite version || echo "0.0.0")
           echo "kuzu_version=$KUZU_VERSION" >> $GITHUB_OUTPUT
           echo "kuzu_lite_version=$KUZU_LITE_VERSION" >> $GITHUB_OUTPUT
           
