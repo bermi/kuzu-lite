@@ -42,9 +42,11 @@ jobs:
         RUN yarn build
         RUN mkdir -p ../../../prebuilt
         RUN cp -f ./build/kuzujs.node ../../../prebuilt/kuzujs-alpine-${{ matrix.arch }}.node
-        cp -f prebuilt/kuzujs-alpine-${{ matrix.arch }}.node kuzujs.node
-        cd util
-        node ./test.js || echo "test_failed=true" >> $GITHUB_OUTPUT
+        WORKDIR /app
+        RUN yarn build
+        RUN cp -f /app/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node kuzujs.node
+        RUN cd util
+        RUN node ./test.js || echo "test_failed=true" >> $GITHUB_OUTPUT
         EOF
 
         docker create --name kuzu-lite-build-container kuzu-lite-build
