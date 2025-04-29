@@ -27,8 +27,8 @@ jobs:
         
     - name: Install dependencies
       run: |
-        yarn remove kuzu || true
-        yarn add kuzu
+        npm uninstall kuzu || true
+        npm install kuzu
         
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -40,9 +40,9 @@ jobs:
           -v ${{ github.workspace }}/node_modules/kuzu:/kuzu \
           node:18-alpine /bin/sh -c "
             cd /kuzu/kuzu-source/tools/nodejs_api && \
-            yarn install && \
+            npm install && \
             apk add --no-cache g++ gcompat libc6-compat build-base python3 libressl-dev make cmake zlib-dev musl-dev && \
-            yarn build && \
+            npm run build && \
             mkdir -p /kuzu/prebuilt && \
             cp -f ./build/kuzujs.node /kuzu/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node
           "
@@ -51,7 +51,7 @@ jobs:
       run: |
         mkdir -p prebuilt \
         && cp -f node_modules/kuzu/prebuilt/*.node prebuilt/ \
-        && yarn build 
+        && npm run build 
 
     - name: Test in Docker for alpine (${{ matrix.arch }})
       id: docker_test
