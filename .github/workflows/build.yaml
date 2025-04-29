@@ -20,6 +20,9 @@ jobs:
           - arch: amd64
             runner: ubuntu-latest
     steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      
     - name: Set up Node.js
       uses: actions/setup-node@v3
       with:
@@ -27,11 +30,8 @@ jobs:
         
     - name: Install dependencies
       run: |
-        npm uninstall kuzu || true
-        npm install kuzu
-        
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
+        yarn remove kuzu || true
+        yarn add kuzu
       
     - name: Build in Docker (${{ matrix.arch }})
       run: |
@@ -40,9 +40,9 @@ jobs:
           -v ${{ github.workspace }}/node_modules/kuzu:/kuzu \
           node:18-alpine /bin/sh -c "
             cd /kuzu/kuzu-source/tools/nodejs_api && \
-            npm install && \
+            yarn install && \
             apk add --no-cache g++ gcompat libc6-compat build-base python3 libressl-dev make cmake zlib-dev musl-dev && \
-            npm run build && \
+            yarn build && \
             mkdir -p /kuzu/prebuilt && \
             cp -f ./build/kuzujs.node /kuzu/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node
           "
@@ -51,7 +51,7 @@ jobs:
       run: |
         mkdir -p prebuilt \
         && cp -f node_modules/kuzu/prebuilt/*.node prebuilt/ \
-        && npm run build 
+        && yarn build 
 
     - name: Test in Docker for alpine (${{ matrix.arch }})
       id: docker_test
