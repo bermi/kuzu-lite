@@ -22,6 +22,7 @@ const kuzu = require("./../");
 
   const queryResult = await conn.query("MATCH (p)-[:ActedIn]->(m) RETURN *");
 
+  // conn.query(`EXPORT DATABASE "./util/demo_db_export" `);
 
   // Get all rows from the query result
   const rows = await queryResult.getAll();
@@ -32,5 +33,7 @@ const kuzu = require("./../");
   }
   conn.close();
   db.close();
+
+  process.exit(0);
 
 })();

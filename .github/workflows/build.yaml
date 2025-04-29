@@ -1,3 +1,4 @@
+# spell-checker:ignore Buildx buildx stefanzweifel
 name: Build KuZu Lite
 
 on:
@@ -11,63 +12,48 @@ jobs:
   
   build:
     name: Build on ${{ matrix.arch }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.runner }}
     strategy:
       matrix:
-        arch: [arm64, amd64]
+        include:
+          - arch: arm64
+            runner: [self-hosted, macOS, ARM64]
+          - arch: amd64
+            runner: [self-hosted, Linux, X64]
     
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
       
-    - name: Set up Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
-        
-    - name: Install dependencies
-      run: |
-        yarn remove kuzu || true
-        yarn add kuzu
-        
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v2
-      
-    - name: Build in Docker (${{ matrix.arch }})
-      run: |
-        docker run --rm \
-          --platform linux/${{ matrix.arch }} \
-          -v ${{ github.workspace }}/node_modules/kuzu:/kuzu \
-          node:18-alpine /bin/sh -c "
-            cd /kuzu/kuzu-source/tools/nodejs_api && \
-            yarn install && \
-            apk add --no-cache g++ gcompat libc6-compat build-base python3 libressl-dev make cmake zlib-dev musl-dev && \
-            yarn build && \
-            mkdir -p /kuzu/prebuilt && \
-            cp -f ./build/kuzujs.node /kuzu/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node
-          "
-          
-    - name: Copy compiled file to repo directory
-      run: |
-        mkdir -p prebuilt \
-        && cp -f node_modules/kuzu/prebuilt/*.node prebuilt/ \
-        && yarn build 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-    - name: Test in Docker for alpine (${{ matrix.arch }})
-      id: docker_test
+    - name: Build and run in Docker
       run: |
-        docker run --rm \
-          --platform linux/${{ matrix.arch }} \
-          -v ${{ github.workspace }}:/kuzu-lite \
-          node:18-alpine /bin/sh -c "
-            cd /kuzu-lite && \
-            cp -f /kuzu-lite/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node /kuzu-lite/kuzujs.node && \
-            cd /kuzu-lite/util && \
-            node ./test.js 
-          " || echo "test_failed=true" >> $GITHUB_OUTPUT
-      
+        docker build -t kuzu-lite-build -f- . <<EOF
+        FROM node:18-alpine
+        RUN apk add --no-cache g++ build-base python3 make cmake zlib-dev musl-dev git
+        WORKDIR /app
+        COPY . .
+        RUN yarn remove kuzu || true
+        RUN yarn add kuzu
+        WORKDIR /app/node_modules/kuzu/kuzu-source/tools/nodejs_api
+        RUN yarn install
+        RUN yarn build
+        RUN mkdir -p ../../../prebuilt
+        RUN cp -f ./build/kuzujs.node ../../../prebuilt/kuzujs-alpine-${{ matrix.arch }}.node
+        cp -f prebuilt/kuzujs-alpine-${{ matrix.arch }}.node kuzujs.node
+        cd util
+        node ./test.js || echo "test_failed=true" >> $GITHUB_OUTPUT
+        EOF
+
+        docker create --name kuzu-lite-build-container kuzu-lite-build
+        docker cp kuzu-lite-build-container:/app/node_modules/kuzu/prebuilt/. ./prebuilt/
+        docker rm kuzu-lite-build-container
+
     - name: Commit and push changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: "Add compiled kuzujs-alpine-${{ matrix.arch }}.node for kuzu v${{ needs.check-versions.outputs.kuzu_version }} [skip ci]"
-        file_pattern: 'prebuilt/*.node, *.js'
+        commit_options: '--no-verify'
+        add: 'prebuilt/*.node *.js'
+        message: "Add compiled kuzujs-alpine-${{ matrix.arch }}.node for kuzu v${{ needs.check-versions.outputs.kuzu_version }} [skip ci]"
