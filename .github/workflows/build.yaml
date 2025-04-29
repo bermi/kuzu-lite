@@ -16,8 +16,9 @@ jobs:
       matrix:
         include:
           - arch: arm64
-            runner: [self-hosted, macOS, ARM64]
+            runner: self-hosted
           - arch: amd64
+            runner: ubuntu-latest
     steps:
     - name: Set up Node.js
       uses: actions/setup-node@v3
