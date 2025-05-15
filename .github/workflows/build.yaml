@@ -12,6 +12,7 @@ jobs:
   build:
     name: Build on ${{ matrix.arch }}
     runs-on: ${{ matrix.runner }}
+    environment: TOKENS 
     strategy:
       matrix:
         include:
