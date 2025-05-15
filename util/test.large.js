@@ -14,11 +14,12 @@ const kuzu = require("./../");
 
   // Print the rows
   console.log("res count: " ,rows.length);
-    for (const row of rows) {
-        console.log(row);
-    }
-//   conn.close();
-//   db.close();
+    // for (const row of rows) {
+    //     console.log(row);
+    // }
+  queryResult.close();
+  conn.close();
+  db.close();
 
   process.exit(0);
 

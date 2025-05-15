@@ -31,6 +31,7 @@ const kuzu = require("./../");
   for (const row of rows) {
     console.log(row);
   }
+  queryResult.close();
   conn.close();
   db.close();
 

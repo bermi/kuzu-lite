@@ -18,6 +18,9 @@ def kuzu_worker(db_path, conn_pipe):
                 result = conn.execute(query)
                 df = result.get_as_df()
                 conn_pipe.send(("ok", pickle.dumps(df)))
+                result.close()
+                conn.close()
+                db.close()
             except Exception as e:
                 conn_pipe.send(("error", traceback.format_exc()))
     except Exception as e:

@@ -47,6 +47,9 @@ jobs:
             cp -f ./build/kuzujs.node /kuzu/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node
           "
           
+    - name: Configure npm authentication
+      run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKENS }}" > ~/.npmrc
+
     - name: Copy compiled file to repo directory
       run: |
         mkdir -p prebuilt \

@@ -32,11 +32,20 @@ jobs:
           script: |
             const kuzu_version = '${{ steps.check_versions.outputs.kuzu_version }}';
             const kuzu_lite_version = '${{ steps.check_versions.outputs.kuzu_lite_version }}';
-            
+
+            // 创建 issue 通知
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: `kuzu 更新通知: 新版本 ${kuzu_version} 可用`,
               body: `检测到 kuzu (${kuzu_version}) 比当前的 kuzu-lite (${kuzu_lite_version}) 版本更新。\n\n请考虑更新 kuzu-lite。`,
               labels: ['version-update']
+            });
+
+            // 主动触发 build.yaml workflow
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'build.yaml',
+              ref: context.ref
             });
