@@ -1,9 +1,12 @@
 const path = require("path");
 const kuzu = require("./../");
-
+// ## the extensions will install to ~/.kuzu/extension/0.10.0/win_amd64/xxx  refer https://extension.kuzudb.com/v0.10.0/win_amd64/xxx
 (async () => {
   // Create an empty on-disk database and connect to it
   const db = new kuzu.Database(path.join(__dirname, "./demo_db"));
+  console.log("Version is", kuzu.VERSION);
+  console.log("Storage version is", kuzu.STORAGE_VERSION);
+
   const conn = new kuzu.Connection(db);
   try {
     await conn.query(`
@@ -20,7 +23,7 @@ const kuzu = require("./../");
     console.error("Create DB failed:",e.message);
   }
 
-  const queryResult = await conn.query("MATCH (p)-[:ActedIn]->(m) RETURN *");
+  const queryResult = await conn.query(`LOAD neo4j;`);
 
   // conn.query(`EXPORT DATABASE "./util/demo_db_export" `);
 

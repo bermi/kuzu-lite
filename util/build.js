@@ -140,8 +140,8 @@ const asyncVersion = () => {
 
 const rootDir = path.join(__dirname, "..");
 
-//force install 
-installPackage("kuzu");
+// already install kuzu with docker or action
+// installPackage("kuzu");
 
 // Delete files before copying new ones
 deleteFiles(rootDir, [
