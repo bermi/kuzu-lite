@@ -88,10 +88,14 @@ const npmPublish = (package) => {
   );
 
   const childProcess = require("child_process");
-  childProcess.execSync("npm publish --access public --registry https://registry.npmjs.org", {
-    cwd: rootDir,
-    stdio: "inherit",
-  });
+  try {
+    childProcess.execSync("npm publish --access public --registry https://registry.npmjs.org", {
+      cwd: rootDir,
+      stdio: "inherit",
+    });
+  } catch (err) {
+    console.error("npm publish failed:", err);
+  }
 };
 
 const asyncVersion = () => {
