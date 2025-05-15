@@ -51,6 +51,8 @@ jobs:
       run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKENS }}" > ~/.npmrc
 
     - name: Copy compiled file to repo directory
+      env:
+        NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       run: |
         mkdir -p prebuilt \
         && cp -f node_modules/kuzu/prebuilt/*.node prebuilt/ \

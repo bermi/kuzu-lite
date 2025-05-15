@@ -80,8 +80,15 @@ const npmPublish = (package) => {
   console.log(
     `Publishing package ${package.name}(${package.version})... to npm`
   );
+  const npmrcPath = path.join(rootDir, ".npmrc");
+  fs.writeFileSync(
+    npmrcPath,
+    `//registry.npmjs.org/:_authToken=${process.env.NPM_TOKEN}\n`,
+    { encoding: "utf-8" }
+  );
+
   const childProcess = require("child_process");
-  childProcess.execSync("npm publish --access public", {
+  childProcess.execSync("npm publish --access public --registry https://registry.npmjs.org", {
     cwd: rootDir,
     stdio: "inherit",
   });
