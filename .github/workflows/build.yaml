@@ -31,8 +31,9 @@ jobs:
         
     - name: Install dependencies
       run: |
-        yarn remove kuzu || true
-        yarn add kuzu
+        yarn cache clean 
+        yarn add kuzu --force
+        echo "kuzu version: $(yarn list kuzu | grep kuzu)"
       
     - name: Build in Docker (${{ matrix.arch }})
       run: |
@@ -45,7 +46,7 @@ jobs:
             apk add --no-cache g++ gcompat libc6-compat build-base python3 libressl-dev make cmake zlib-dev musl-dev && \
             yarn build && \
             mkdir -p /kuzu/prebuilt && \
-            cp -f ./build/kuzujs.node /kuzu/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node
+            cp -f  /kuzu/kuzu-source/tools/nodejs_api/build/kuzujs.node /kuzu/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node
           "
           
     - name: Configure npm authentication

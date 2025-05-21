@@ -9,16 +9,31 @@ then
     echo "Msys"
 fi
 
+# # Build amd64 artifact
+# docker buildx build --platform=linux/amd64 --target build-amd64 -t kuzu-lite:build-amd64 -f ${APP_ROOT_DIR}/Dockerfile ./
 
-docker buildx build -t kuzu-lite:latest -f ${APP_ROOT_DIR}/Dockerfile ./
+# # Extract amd64 prebuilt file
+# docker create --name extract-amd64 kuzu-lite:build-amd64
+# docker cp extract-amd64:/app/node_modules/kuzu/prebuilt/kuzujs-alpine-amd64.node ./prebuilt/
+# docker rm extract-amd64
 
-docker run --rm \
-    -v ${APP_ROOT_DIR}:/kuzu-lite \
-    kuzu-lite:latest /bin/sh -c "
-        cd /kuzu-lite && \
-        cp -f /kuzu-lite/prebuilt/*.node /kuzu-lite
-    "
-    
+# Build arm64 artifact
+# docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+if ! docker buildx inspect myarmbuilder &>/dev/null; then
+    docker buildx create --name myarmbuilder --platform linux/arm64 --use
+else
+    docker buildx use myarmbuilder
+fi
+docker buildx build --platform=linux/arm64 --target build-arm64 -t kuzu-lite:build-arm64 -f ${APP_ROOT_DIR}/Dockerfile ./
+
+# Extract arm64 prebuilt file
+docker create --name extract-arm64 kuzu-lite:build-arm64
+docker cp extract-arm64:/app/node_modules/kuzu/prebuilt/kuzujs-alpine-arm64.node ./prebuilt/
+docker rm extract-arm64
+
+echo "All prebuilt files have been extracted to ./prebuilt/"
+
 run_test() {
     local arch=$1
     local node_file=$2
@@ -26,7 +41,7 @@ run_test() {
     echo "Running tests on $arch architecture..."
     docker run --rm \
         --platform linux/$arch \
-        -v ${APP_ROOT_DIR}:/kuzu-lite \
+        -v "${APP_ROOT_DIR}:/kuzu-lite" \
         node:18-alpine /bin/sh -c "
             cd /kuzu-lite && \
             cp -f /kuzu-lite/prebuilt/$node_file /kuzu-lite/kuzujs.node && \
@@ -37,8 +52,8 @@ run_test() {
 
 
 # Run tests for different architectures
+run_test "amd64" "kuzujs-alpine-amd64.node"
 run_test "arm64" "kuzujs-alpine-arm64.node"
-run_test "amd64" "kuzujs-alpine-x64.node"
 
 echo "All tests completed successfully!"
 

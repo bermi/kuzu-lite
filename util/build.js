@@ -124,6 +124,7 @@ const asyncVersion = () => {
 
   if (projectPackageJson.version != kuzuPackageJson.version) {
     projectPackageJson.version = kuzuPackageJson.version;
+    projectPackageJson.devDependencies.kuzu = kuzuPackageJson.version;
     // Write the updated package.json back
     fs.writeFileSync(
       projectPackageJsonPath,
@@ -155,6 +156,7 @@ deleteFiles(rootDir, [
   ".gitignore",
   ".github",
   ".dockerignore",
+  "Dockerfile",
   ".npmignore"
 ]);
 
@@ -173,7 +175,8 @@ if (fs.existsSync(srcDir)) {
     ".gitignore",
     ".github",
     ".dockerignore",
-    ".npmignore"
+    ".npmignore",
+    "Dockerfile",
   ]);
   console.log("Copying completed!");
 } else {

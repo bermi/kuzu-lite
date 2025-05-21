@@ -2,39 +2,41 @@
 # sudo apt-get install qemu-user-static  # Debian/Ubuntu
 
 # re-install kuzu for clean all build info
-yarn remove kuzu
-yarn add kuzu
+yarn remove kuzu 
+yarn add kuzu --no-cache
 
 
 # 2. run qemu-aarch64-alpine and qemu-amd64-alpine
 
-docker rm -f qemu-aarch64-alpine `
-&& `
-docker run -it `
---name qemu-aarch64-alpine `
--v .\node_modules\kuzu:/kuzu `
---platform linux/arm64 `
+
+docker rm -f qemu-aarch64-alpine \
+&& \
+docker run -it \
+--name qemu-aarch64-alpine \
+-v ./:/app \
+--platform linux/arm64 \
 node:18-alpine
 
+
  
-docker rm -f qemu-amd64-alpine `
-&& `
-docker run -it `
---platform linux/amd64 `
--v .\node_modules\kuzu:/kuzu `
---name qemu-amd64-alpine `
+docker rm -f qemu-amd64-alpine \
+&& \
+docker run -it \
+--platform linux/amd64 \
+-v ./:/app \
+--name qemu-amd64-alpine \
 node:18-alpine
 
 
 
 # 3. go to kuzu source
 
-cd /kuzu/kuzu-source/tools/nodejs_api
+cd /app/node_modules/kuzu/kuzu-source/tools/nodejs_api
 
 
 # 4. run ***yarn***
 
-yarn install
+yarn install --no-cache
  
 
 # 5. install  dependencies  (alpine)
@@ -70,8 +72,21 @@ sudo apt install -y \
     curl
 
 
+
+
+
+
 # 6.  yarn build
+
+```sh
+# 替换 build.js 文件中的 "THREADS =" 为 "THREADS = 2;//"
+sed -i 's/THREADS =/THREADS = 2;\/\//' build.js
+```
+
+```
 yarn build
+```
+ 
 
 # 7.  copy the kuzujs.node to kuzujs-alpine-arm64.node
-cp -f ./build/kuzujs.node ./../../../prebuilt/kuzujs-alpine-arm64.node
+cp -f /app/node_modules/kuzu/kuzu-source/tools/nodejs_api/build/kuzujs.node /app/node_modules/kuzu/prebuilt/kuzujs-alpine-arm64.node

@@ -1,6 +1,6 @@
 {
   "name": "@kineviz/kuzu-lite",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "An in-process property graph database management system built for query speed and scalability.",
   "main": "index.js",
   "homepage": "https://kuzudb.com/",
@@ -17,7 +17,7 @@
   "author": "Kùzu Team",
   "license": "MIT",
   "devDependencies": {
-    "kuzu": "^0.9.0"
+    "kuzu": "^0.10.0"
   },
   "dependencies": {
     "https-proxy-agent": "^7.0.6"
