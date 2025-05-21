@@ -43,7 +43,7 @@ jobs:
           node:18-alpine /bin/sh -c "
             cd /kuzu/kuzu-source/tools/nodejs_api && \
             yarn install && \
-            apk add --no-cache g++ gcompat libc6-compat build-base python3 libressl-dev make cmake zlib-dev musl-dev && \
+            apk add --no-cache g++ build-base python3 openssl-dev make cmake zlib-dev musl-dev && \
             yarn build && \
             mkdir -p /kuzu/prebuilt && \
             cp -f  /kuzu/kuzu-source/tools/nodejs_api/build/kuzujs.node /kuzu/prebuilt/kuzujs-alpine-${{ matrix.arch }}.node
@@ -73,8 +73,12 @@ jobs:
             node ./test.js 
           " || echo "test_failed=true" >> $GITHUB_OUTPUT
       
-    - name: Commit and push changes
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: "Add compiled kuzujs-alpine-${{ matrix.arch }}.node for kuzu v${{ needs.check-versions.outputs.kuzu_version }} [skip ci]"
-        file_pattern: 'prebuilt/*.node, *.js'
+    - name: Reset and force push changes
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git fetch origin ${{ github.ref }}
+        git reset --hard origin/${{ github.ref_name }}
+        git add prebuilt/*.node *.js
+        git commit -m "Add compiled kuzujs-alpine-${{ matrix.arch }}.node for kuzu v${{ needs.check-versions.outputs.kuzu_version }} [skip ci]" || echo "Nothing to commit"
+        git push --force

@@ -9,16 +9,16 @@ then
     echo "Msys"
 fi
 
-# # Build amd64 artifact
-# docker buildx build --platform=linux/amd64 --target build-amd64 -t kuzu-lite:build-amd64 -f ${APP_ROOT_DIR}/Dockerfile ./
+# Build amd64 artifact
+docker buildx build --platform=linux/amd64 --target build-amd64 -t kuzu-lite:build-amd64 -f ${APP_ROOT_DIR}/Dockerfile ./
 
-# # Extract amd64 prebuilt file
-# docker create --name extract-amd64 kuzu-lite:build-amd64
-# docker cp extract-amd64:/app/node_modules/kuzu/prebuilt/kuzujs-alpine-amd64.node ./prebuilt/
-# docker rm extract-amd64
+# Extract amd64 prebuilt file
+docker create --name extract-amd64 kuzu-lite:build-amd64
+docker cp extract-amd64:/app/node_modules/kuzu/prebuilt/kuzujs-alpine-amd64.node ./prebuilt/
+docker rm extract-amd64
 
-# Build arm64 artifact
-# docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+Build arm64 artifact
+docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
 if ! docker buildx inspect myarmbuilder &>/dev/null; then
     docker buildx create --name myarmbuilder --platform linux/arm64 --use
@@ -48,6 +48,11 @@ run_test() {
             cd /kuzu-lite/util && \
             node ./test.js 
         "
+}
+
+build_extension(){
+     docker run -it -d \
+        kuzu-lite:build-amd64 node
 }
 
 
