@@ -1,6 +1,7 @@
 .*
 Dockerfile
 prebuilt
+extensions
 util/demo_db
 util/demo_*
 kuzujs.node

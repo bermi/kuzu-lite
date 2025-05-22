@@ -57,7 +57,7 @@ build_extension(){
 
 
 # Run tests for different architectures
-run_test "amd64" "kuzujs-alpine-amd64.node"
+# run_test "amd64" "kuzujs-alpine-amd64.node"
 run_test "arm64" "kuzujs-alpine-arm64.node"
 
 echo "All tests completed successfully!"

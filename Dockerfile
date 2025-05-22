@@ -15,10 +15,9 @@ RUN apk add --no-cache  \
     cmake \
     zlib-dev \
     musl-dev
-    
+
 RUN yarn cache clean && yarn add kuzu --force
 RUN cd /app/node_modules/kuzu/kuzu-source/tools/nodejs_api && \
-    sed -i 's/THREADS =/THREADS = 1;\/\//' build.js && \
     yarn install 
 RUN yarn build  
    
@@ -43,7 +42,6 @@ RUN apk add --no-cache \
 
 RUN yarn cache clean && yarn add kuzu --force
 RUN cd /app/node_modules/kuzu/kuzu-source/tools/nodejs_api && \
-    sed -i 's/THREADS =/THREADS = 1;\/\//' build.js && \
     yarn install 
 RUN yarn build  
    
