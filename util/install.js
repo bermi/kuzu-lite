@@ -5,13 +5,17 @@ const https = require("https");
 const { HttpsProxyAgent } = require('https-proxy-agent');
 const packageJson = require("./../package.json");
 
-const arch = process.arch;
 const rootDir = path.join(__dirname, "..");
 
+let arch = process.arch;
 let platform = process.platform;
 const isAlpine = platform == "linux" && fs.readFileSync('/etc/os-release', 'utf8').includes('Alpine Linux');
 if (isAlpine) {
   platform = "alpine";
+}
+
+if(isAlpine && arch == "x64"){
+  arch="amd64"
 }
 
 const packageVersion =  String(packageJson.version).split("-")[0];
