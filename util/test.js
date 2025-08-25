@@ -10,8 +10,8 @@ const kuzu = require("./../");
     fs.rmSync(dbPath, { recursive: true, force: true });
   }
   const db = new kuzu.Database(dbPath);
-  console.log("Version is", kuzu.VERSION);
-  console.log("Storage version is", kuzu.STORAGE_VERSION);
+  console.log("KuzuDB Version is", kuzu.VERSION);
+  console.log("KuzuDB Storage version is", kuzu.STORAGE_VERSION);
 
   const conn = new kuzu.Connection(db);
   try {
