@@ -75,11 +75,20 @@ jobs:
       
     - name: Merge and push changes
       run: |
+        export kuzu_version=$(node -p "require('./node_modules/kuzu/package.json').version")
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
+        git add prebuilt/*.node *.js package.json || true
+        git commit -m "Add compiled kuzujs-alpine-${{ matrix.arch }}.node for kuzu v$kuzu_version [skip ci]" || echo "Nothing to commit"
         git fetch origin ${{ github.ref }}
-        git merge origin/${{ github.ref_name }}
-        git add prebuilt/*.node *.js
-        git commit -m "Add compiled kuzujs-alpine-${{ matrix.arch }}.node for kuzu v${{ needs.check-versions.outputs.kuzu_version }} [skip ci]" || echo "Nothing to commit"
-        git push
-      
+        git merge -X ours origin/${{ github.ref_name }} --no-edit || true
+        git push 
+
+    - name: Tag with version
+      run: |
+        export kuzu_version=$(node -p "require('./node_modules/kuzu/package.json').version")
+        git fetch --tags origin
+        git tag -d "$kuzu_version" || true
+        git push origin ":refs/tags/$kuzu_version" || true
+        git tag -a "$kuzu_version" -m "Release $kuzu_version"
+        git push origin "$kuzu_version"

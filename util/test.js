@@ -29,7 +29,7 @@ const kuzu = require("./../");
     console.error("Create DB failed:",e.message);
   }
 
-  await conn.query(`load neo4j;`);
+  // await conn.query(`load neo4j;`);
   const queryResult = await conn.query(`MATCH (p:Person)-[r:ActedIn]->(m:Movie) RETURN *;`);
 
   // conn.query(`EXPORT DATABASE "./util/demo_db_export" `);
