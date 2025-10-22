@@ -19,7 +19,7 @@
   "author": "Kùzu Team",
   "license": "MIT",
   "devDependencies": {
-    "kuzu": "0.11.3"
+    "kuzu": "^0.11.3"
   },
   "dependencies": {
     "https-proxy-agent": "^7.0.6"
